@@ -1,68 +1,39 @@
 const { testServerId } = require("../../config.json");
-const commandComparing = require("../../utils/commandCompraing");
-const getApplicationCommands = require("../../utils/getApplicationCommands");
-const getLocalCommands = require("../../utils/getLocalCommands");
+const getApplicationContextMenus = require("../../utils/getApplicationCommands");
+const getLocalContextMenus = require("../../utils/getLocalContextMenus");
+
 require("colors");
 
 module.exports = async (client) => {
     try {
-        const [localCommands, applicationCommands] = await Promise.all([
-            getLocalCommands(),
-            getApplicationCommands(client, testServerId),
-        ]);
+        const localContextMenus = getLocalContextMenus();
+        const applicationContextMenus = await getApplicationContextMenus(client)//, testServerId);
 
-        for (const localCommand of localCommands) {
-            const {data, deleted } = localCommand;
-            const {
-                name: commandName,
-                description: commandDescription,
-                optoions: commandOptions,
-            } = data;
+        for (const localContextMenu of localContextMenus) {
+            const { data } = localContextMenu;
 
-            const existingCommand = await applicationCommands.cache.find(
-                (cmd) => cmd.name === commandName
-            );
+            const contextMenuName = data.name;
+            const contextMenuType = data.type;
 
-            if (deleted) {
-                if (existingCommand) {
-                    await applicationCommands.delete(existingCommand.id);
-                    console.log (
-                        `[COMMAND REGISTERY] Application command ${commandName} has been deleted.`
-                        .red
-                    );
+            const existingContextMenu = await applicationContextMenus.cache.find((cmd) => cmd.name === contextMenuName);
+
+            if (existingContextMenu) {
+                if (localContextMenu.deleted) {
+                    await applicationContextMenus.delete(existingContextMenu.id);
+                    console.log(`Application command ${contextMenuName} has been deleted`.red);
+                    continue;
+                };
             } else {
-                console.log (
-                    `[COMMAND REGISTERY] Application command ${commandName} has been skipped, since property "deleted" is set to "true".`
-                   .grey
-                );
-            } 
-        } else if (existingCommand) {
-            if (commandComparing(existingCommand, localCommand)) {
-                await applicationCommands.edit(existingCommand.id, {
-                    name: commandName, 
-                    description: commandDescription, 
-                    options: commandOptions
-                });
-                console.log (
-                    `[COMMAND REGISTERY] Application command ${commandName} has been edited.`
-                  .yellow
-                );
-            }
-        } else {
-            await applicationCommands.create({
-                            name: commandName, 
-                            description: commandDescription, 
-                            options: commandOptions
-                        });
-                        console.log (
-                            `[COMMAND REGISTERY] Application command ${commandName} has been registered.`
-                          .green
-                        );
-        }
-      }
-    } catch (error) {
-        console.log(
-            `[ERROR] An error occured inside the command registery:\n ${error}`.red
-        );
+                if (localContextMenu.delete) {
+                    console.log(`Application command ${contextMenuName} has been skipped, since property "deleted" it set to "true"`.grey);
+                    continue;
+                };
+
+                await applicationContextMenus.create({ name: contextMenuName, type: contextMenuType });
+                console.log(`Application command ${contextMenuName} has been registered.`.green);
+            };
+        };
+    } catch (err) {
+        console.log(`An error occurred! ${err}`.red);
     }
 };

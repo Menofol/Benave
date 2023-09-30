@@ -3,17 +3,17 @@ require("color");
 const { EmbedBuilder } = require("discord.js");
 const { developersId, testServerId } = require("../../config.json");
 const mConfig = require("../../messageConfig.json");
-const getLocalCommands = require("../../utils/getLocalCommands");
+const getLocalContextMenus = require("../../utils/getLocalContextMenus");
 
 module.exports = async (client, interaction) => {
-    if (!interaction.isChatInputCommand()) return;
-    const localCommands = getLocalCommands();
+    if (!interaction.isContextMenuCommand()) return;
+    const localContextMenus = getLocalCommands();
 
     try {
-        const commandObject = localCommands.find((cmd) => cmd.data.name === interaction.commandName);
-        if (!commandObject) return;
+        const menuObject = getLocalContextMenus.find((cmd) => cmd.data.name === interaction.commandName);
+        if (!menuObject) return;
 
-        if (commandObject.devOnly) {
+        if (menuObject.devOnly) {
             if (!developersId.includes(interaction.member.id)) {
                 const rEmbed = EmbedBuilder()
                     .setColor(`${mConfig.embedColorError}`)
@@ -23,7 +23,7 @@ module.exports = async (client, interaction) => {
             };
         };
 
-        if (commandObject.testMode) {
+        if (menuObject.testMode) {
             if (interaction.guild.id !== testServerId ) {
                 const rEmbed = EmbedBuilder()
                    .setColor(`${mConfig.embedColorError}`)
@@ -33,8 +33,8 @@ module.exports = async (client, interaction) => {
             };
         };
 
-        if (commandObject.userPermissions?.length) {
-            for (const permission of commandObject.userPermissions) {
+        if (menuObject.userPermissions?.length) {
+            for (const permission of menuObject.userPermissions) {
                 if (interaction.member.permissons.has(permission)) {
                     continue;
                 };
@@ -46,8 +46,8 @@ module.exports = async (client, interaction) => {
             };
         };
 
-        if (commandObject.botPermissions?.length) {
-            for (const permission of commandObject.botPermissions) {
+        if (menuObject.botPermissions?.length) {
+            for (const permission of menuObject.botPermissions) {
                 const bot = interaction.guild.members.me;
                 if(bot.permissions.has(permission)) {
                     continue;
@@ -60,7 +60,7 @@ module.exports = async (client, interaction) => {
             };
         };
 
-        await commandObject.run(client, interaction);
+        await menuObject.run(client, interaction);
     } catch (err) {
         console.log(`An error occurred! ${err}`.red);
     };
