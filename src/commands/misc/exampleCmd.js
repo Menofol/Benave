@@ -2,7 +2,7 @@ const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("test")
+        .setName("tests")
         .setDescription("Проверка")
         .setDMPermission(false)
         .addSubcommandGroup((subcommandgroup) => 
