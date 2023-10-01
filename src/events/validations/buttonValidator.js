@@ -7,10 +7,10 @@ const getButtons = require("../../utils/getButtons");
 
 module.exports = async (client, interaction) => {
     if (!interaction.isButton()) return;
-    const buttons = getButtons();
+    const buttons = getButtons(); 
 
     try {
-        const buttonObject = localCommands.find((cmd) => cmd.data.name === interaction.commandName);
+        const buttonObject = buttons.find((btn) => btn.customId === interaction.customId);
         if (!buttonObject) return;
 
         if (buttonObject.devOnly) {

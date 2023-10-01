@@ -3,7 +3,7 @@ const getAllFiles = require("./getAllFiles");
 
 module.exports = (exceptions = []) => {
     let buttons = [];
-    const buttonFiles = getAllFiles(path.join(__dirname, "..", "contextmenus"), true);
+    const buttonFiles = getAllFiles(path.join(__dirname, "..", "buttons"));
 
         for (const buttonFile of buttonFiles) {
             const buttonObject = require(buttonFile);

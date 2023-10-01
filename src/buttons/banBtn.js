@@ -11,8 +11,8 @@ module.exports = {
         const { message, channel, guildId, guild, user } = interaction;
 
         const embedAuthor = message.embeds[0].author;
-        const fetchdMembers = await guild.members.fetch({ query: embedAuthor.name, limit: 1 });
-        const targetMember = fetchMembers.first();
+        const fetchedMemebers = await guild.members.fetch({ query: embedAuthor.name, limit: 1 });
+        const targetMember = fetchedMemebers.first();
 
         const rEmbed = new EmbedBuilder()
             .setColor("FFFFFF")
@@ -73,6 +73,7 @@ module.exports = {
                 { name: "Причина", value: `${reason}`, inline: true }
             )
             .setFooter({ iconURL: client.user.displayAvatarURL({ dynamic: true }), text: `${client.user.username} - логирование действий`})
+            
         loggingChannel.send({ embeds: [lEmbed] });
 
         rEmbed

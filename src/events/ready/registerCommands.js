@@ -1,36 +1,43 @@
 const { testServerId } = require("../../config.json");
-const getApplicationContextMenus = require("../../utils/getApplicationCommands");
-const getLocalContextMenus = require("../../utils/getLocalContextMenus");
+const commandComparing = require("../../utils/commandCompraing");
+const getApplicationCommands = require("../../utils/getApplicationCommands");
+const getLocalCommands = require("../../utils/getLocalContextMenus");
 
 require("colors");
 
 module.exports = async (client) => {
     try {
-        const localContextMenus = getLocalContextMenus();
-        const applicationContextMenus = await getApplicationContextMenus(client)//, testServerId);
+        const localCommands = getLocalCommands();
+        const applicationCommands = await getApplicationCommands(client)//, testServerId);
 
-        for (const localContextMenu of localContextMenus) {
-            const { data } = localContextMenu;
+        for (const localCommand of localCommands) {
+            const { data } = localCommand;
 
-            const contextMenuName = data.name;
-            const contextMenuType = data.type;
+            const commandName = data.name;
+            const commandDescription = data.description;
+            const commandOptions = data.options;
 
-            const existingContextMenu = await applicationContextMenus.cache.find((cmd) => cmd.name === contextMenuName);
+            const existingCommand = await applicationCommands.cache.find((cmd) => cmd.name === commandName);
 
-            if (existingContextMenu) {
-                if (localContextMenu.deleted) {
-                    await applicationContextMenus.delete(existingContextMenu.id);
-                    console.log(`Application command ${contextMenuName} has been deleted`.red);
+            if (existingCommand) {
+                if (localCommand.deleted) {
+                    await applicationCommands.delete(existingCommand.id);
+                    console.log(`Application command ${commandName} has been deleted`.red);
                     continue;
                 };
+            
+            if (commandComparing(existingCommand, localCommand)) {
+                await applicationCommands.edit(existingCommand.id, { name: commandName, description: commandDescription, options: commandOptions });
+                console.log(`Application command ${commandName} has been edited`.yellow);
+            };
             } else {
-                if (localContextMenu.delete) {
-                    console.log(`Application command ${contextMenuName} has been skipped, since property "deleted" it set to "true"`.grey);
+                if (localCommand.delete) {
+                    console.log(`Application command ${commandName} has been skipped, since property "deleted" it set to "true"`.grey);
                     continue;
                 };
 
-                await applicationContextMenus.create({ name: contextMenuName, type: contextMenuType });
-                console.log(`Application command ${contextMenuName} has been registered.`.green);
+                await applicationCommands.create({ name: commandName, description: commandDescription, options: commandOptions });
+                console.log(`Application command ${commandName} has been registered.`.green);
             };
         };
     } catch (err) {

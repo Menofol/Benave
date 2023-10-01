@@ -1,10 +1,10 @@
 const { ContextMenuCommandBuilder, ApplicationCommandType, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const mConfig = require("../../messageConfig.json");
-const moderationSchema = require("../../schemas/moderation");
+const mConfig = require("../messageConfig.json");
+const moderationSchema = require("../schemas/moderation");
 
 module.exports = {
     data: new ContextMenuCommandBuilder()
-        .setName("Наказать пользователя")
+        .setName("moderete")
         .setType(ApplicationCommandType.User)
     ,
     userPermissions: [PermissionFlagsBits.ManageMessages],

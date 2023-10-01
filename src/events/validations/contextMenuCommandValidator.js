@@ -7,10 +7,10 @@ const getLocalContextMenus = require("../../utils/getLocalContextMenus");
 
 module.exports = async (client, interaction) => {
     if (!interaction.isContextMenuCommand()) return;
-    const localContextMenus = getLocalCommands();
+    const localContextMenus = getLocalContextMenus();
 
     try {
-        const menuObject = getLocalContextMenus.find((cmd) => cmd.data.name === interaction.commandName);
+        const menuObject = localContextMenus.find((cmd) => cmd.data.name === interaction.commandName);
         if (!menuObject) return;
 
         if (menuObject.devOnly) {
